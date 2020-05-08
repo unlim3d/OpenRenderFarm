@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NoDeadLine": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

@@ -1,0 +1,28 @@
+#table img{
+    width: 300px;
+}
+#table video{
+    width: 300px;
+}
+#table td{
+    position: relative;
+    text-align: left;
+    color: white;
+}
+#table td div{
+    word-break: break-all;
+    width: 90%;
+    position: absolute;
+    left: 1em;
+    display: none;
+}
+#table td:hover div{
+    display: block;
+}
+#table .save_btn{
+    width: 90%;
+    height: 2em;
+}
+#table input[type="text"]{
+    width: 90%;
+}
