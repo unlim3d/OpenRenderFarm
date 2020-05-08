@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Windows;
 using Newtonsoft.Json;
@@ -40,21 +41,49 @@ namespace PathSaver
                 // Do something with selected folder string
                 UserPath path = new UserPath();
                 path.SelectedPath = folder;
-                string json = JsonConvert.SerializeObject(path);
-                System.IO.File.WriteAllText(GetPath() + "\\path.json", json);
-                //MessageBoxResult result = MessageBox.Show(folder, "Your choice");
-                //if (result == MessageBoxResult.OK || result == MessageBoxResult.Cancel)
-                //{
-                //    System.Windows.Application.Current.Shutdown();
-                //}
-                System.Windows.Application.Current.Shutdown();
+                if (App.startupArgument == App.StartupArgument.RenderPath)
+                {
+                    if (IsUnique(folder))
+                    {
+                        string json = JsonConvert.SerializeObject(path);
+                        System.IO.File.WriteAllText(GetPathRenderPath() + "\\"+ DateTime.Now.ToString("yyyyMMddHHmmss")+".json", json);
+                        //MessageBoxResult result = MessageBox.Show(folder, "Your choice");
+                        //if (result == MessageBoxResult.OK || result == MessageBoxResult.Cancel)
+                        //{
+                        //    System.Windows.Application.Current.Shutdown();
+                        //}
+                        System.Windows.Application.Current.Shutdown();
+                    }
+                }
             }
         }
 
-        private string GetPath()
+        private bool IsUnique(string path)
+        {
+            bool isUnique = true;
+            foreach (var VARIABLE in Directory.GetFiles(GetPathRenderPath(), "*.json"))
+            {
+
+                UserPath userPath = JsonConvert.DeserializeObject<UserPath>(File.ReadAllText(VARIABLE));
+                string pathFromJson = userPath.SelectedPath;
+
+
+                if (pathFromJson == path)
+                {
+                    isUnique = false;
+                }
+
+            }
+
+            return isUnique;
+
+
+
+        }
+        private string GetPathRenderPath()
         {
             RootPath();
-            string tempPath = Path.Combine(Resources, "FarmSettings");
+            string tempPath = Path.Combine(Resources, "RenderPath");
             if (!Directory.Exists(tempPath))
             {
                 Directory.CreateDirectory(tempPath);
@@ -63,7 +92,7 @@ namespace PathSaver
         }
         public static void RootPath()
         {
-            if (Directory.GetDirectories(Resources, "PathSaver").Length > 0)
+            if (Directory.GetDirectories(Resources, "PathsSaver").Length > 0)
             {
                 Resources = Resources;
 
