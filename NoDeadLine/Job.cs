@@ -215,7 +215,8 @@ public class Job
 
 	public static string FindVrayRGBColorRenderMask(string path)
 	{
-
+		if(Directory.Exists(path))
+		{ 
 		string[] strs = Directory.GetDirectories(path);
 		List<string> checkedstr= new List<string>();
 		for (int i = 0; i < strs.Length; i++)
@@ -229,21 +230,22 @@ public class Job
 		}
 
 		List<string> UniquePaths = new List<string>();
-		for (int i = 0; i < checkedstr.Count; i++)
-		{
-			string[] str = Directory.GetFiles(checkedstr[i], "*RGB_color.*", SearchOption.AllDirectories);
+        for (int i = 0; i < checkedstr.Count; i++)
+        {
+            string[] str = Directory.GetFiles(checkedstr[i], "*RGB_color.*", SearchOption.AllDirectories);
 
-			if(str.Length!=0)
-			for (int j = 0; j < str.Length; j++)
-			{
-				string temp = str[j].Substring(0, str[j].Length - 8);
-				if (!UniquePaths.Contains(temp))
-				{
-					UniquePaths.Add(temp);
-					CheckJobName(str[j]);
-				}
-			}
-		}
+            if (str.Length != 0)
+                for (int j = 0; j < str.Length; j++)
+                {
+                    string temp = str[j].Substring(0, str[j].Length - 8);
+                    if (!UniquePaths.Contains(temp))
+                    {
+                        UniquePaths.Add(temp);
+                        CheckJobName(str[j]);
+                    }
+                }
+        }
+        }
 	
 		
 		 
