@@ -30,9 +30,22 @@ namespace NoDeadLine
                 process.Exited += Process_Exited;
 
                 process.Start();
+
+                AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
             }
         }
 
+        private void CurrentDomain_ProcessExit(object sender, EventArgs e)
+        {
+            string[] nameFiles = Directory.GetFiles(FarmSettings.HardwareInfoCommandLine + "\\", "*.json");
+            if ( nameFiles.Length> 0)
+            {
+                for (int i = 0; i < nameFiles.Length; i++)
+                {
+                    File.Delete(nameFiles[i]);
+                }
+            }
+        }
 
         private void Process_Exited(object sender, EventArgs e)
         {
