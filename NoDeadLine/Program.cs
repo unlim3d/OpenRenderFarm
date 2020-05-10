@@ -51,8 +51,8 @@ class Program
         while (true)
         { 
             Report. CreaterReports();
-           Job.FindVrayRGBColorRenderMask(Path.GetFullPath("C://Dropbox//"));
-            Job.FindVrayRGBColorRenderMask(Path.GetFullPath("r://"));
+             Job.FindVrayRGBColorRenderMask(Path.GetFullPath("C://Dropbox//"));
+                Job.FindVrayRGBColorRenderMask(Path.GetFullPath("r://Mars//"));
 
 
 
@@ -128,7 +128,7 @@ class Program
       
 
         string tmp = " -i  " + OriginalFilename + " -s 640:360 " + "-y " + RenderTask.GetServerPreviewFileNameByOriginalFileName(OriginalFilename, Joba);
-        Console.WriteLine("\nFFMPEG:  " + tmp + "\n");
+      //  Console.WriteLine("\nFFMPEG:  " + tmp + "\n");
         return tmp;
     }
  

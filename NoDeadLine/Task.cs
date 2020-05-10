@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 public class RenderTask
 {
@@ -50,13 +51,23 @@ public class RenderTask
         return value.Substring(0, lastPathSymbol + 1);
     }
 
-   
-    public static string GetServerPreviewFileNameByOriginalFileName(  string value, Job joba)
+
+    public static string GetServerPreviewFileNameByOriginalFileName(string value, Job joba)
     {
-             string str = Path.Combine( FarmSettings.SitePath ,joba.Id+"_"+ Path.GetFileNameWithoutExtension(value));
-             
-            str = str.Replace(@"\\", @"\");
-        return   str+".jpg";
+        string str = Path.Combine(FarmSettings.SitePath, joba.Id + "_" + Path.GetFileNameWithoutExtension(value));
+        if (joba.Id == 16)
+        {
+
+        }
+        str = str.Replace(@"\\", @"\");
+        return str + ".jpg";
+    }
+    public static string GetServerPreviewFileNameByOriginalFileName(string value )
+    {
+        string str = Path.Combine(FarmSettings.SitePath,  Path.GetFileNameWithoutExtension(value));
+
+        str = str.Replace(@"\\", @"\");
+        return str + ".jpg";
     }
     public string ServerPreviewJson
     {
@@ -85,7 +96,10 @@ public class RenderTask
     }
     public static int GetFrameNumberFromFileName(string filename)
     {
-
+        if (filename.Contains("опия"))
+        {
+            return 99999999;
+        }
         int frame = 0;
         int.TryParse(filename.Substring(filename.Length - 8, 4), out frame);
         return frame;

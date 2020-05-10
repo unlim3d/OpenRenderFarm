@@ -12,13 +12,17 @@ using System.Threading.Tasks;
 
 public class Job
 {
-	public Job (string Rpath)
+	public Job (string Rpath, int ID)
 	{
 		RenderPath = Rpath;
+		Id = ID;
+		 
+		
 	}
 	public int Id;
 	public string RenderPath;
 	public string[] ExistingFiles;
+	public string[] RenderChannels;
 	public int[] FramesPreviewsOnServer;	 
 	
 	public string Renderer;
@@ -31,18 +35,20 @@ public class Job
 	public string CollectPath = "";
 	public string ServerPreviewMovFilePath;
 	private string _RenderNameMask;
+	public double FullRendersSize;
+	public double OneFrameSize;
 	public string RenderNameMask
 	{
 		set
 		{
-			PreviewPath = FarmSettings.SitePath + Id.ToString()+"//";
-			ServerPreviewMovFilePath = FarmSettings.SitePath + Id.ToString()+"_"+ value + ".mov";
+			PreviewPath =Path.Combine( FarmSettings.SitePath);
+			ServerPreviewMovFilePath = Path.Combine( FarmSettings.SitePath, Id.ToString()+"_"+ value + ".mov");
 			_RenderNameMask =value;
-			JsonPath = FarmSettings.SitePath + Id.ToString() + "_" + value + ".json";
-			Program.Jobs.Add(this);
-			Console.WriteLine("\nВсего Джоб Обнаружено: " + Program.Jobs.Count);
+			JsonPath = Path.Combine(FarmSettings.SitePath, Id.ToString() + "_" + value + ".json");
+			
+			//	Console.WriteLine("\nВсего Джоб Обнаружено: " + Program.Jobs.Count);
 			Console.WriteLine("Новая джоба :" + _RenderNameMask);
-
+			
 		}
 		get
 		{
@@ -50,7 +56,6 @@ public class Job
 		}
 
 	}
-
 	public static void CheckJobName(string RenderFile)
 	{
 
@@ -66,7 +71,7 @@ public class Job
 			{
 
 
-				Job Joba = new Job(RenderTask.GetDirectoryPathFromFile(RenderFile));
+				Job Joba = new Job(RenderTask.GetDirectoryPathFromFile(RenderFile), Program.Jobs.Count);
 
 				string str = Path.GetFileNameWithoutExtension(RenderFile);
 				str = str.Substring(0, str.Length - 4);
@@ -77,18 +82,77 @@ public class Job
 
 				Joba.ExistingFiles = Program.SearchFile(Joba.RenderPath, "*" + Joba.RenderNameMask + "*");
 
-				Joba.Id = Program.Jobs.Count;
+
 				SaveJobJson(Joba);
 				TryParseOtherFrames(Joba);
+				CheckSequence(Joba);
+				GetChannels(Joba);
+			 	GetDirectorySize(Joba);
 			}
 		}
+
+	}
+
+	static void GetChannels(Job joba)
+	{
+		if (joba.Id == 3)
+		{
+
+		}
+
+
+
+		List<string> Channels = new List<string>();
+		string findPattern = "*"+joba.RenderNameMask.Substring(0, joba.RenderNameMask.Length - 11)+"*";
+		Channels.AddRange(Directory.GetFiles(joba.RenderPath, findPattern)); ;
+		for (int i = 0; i < Channels.Count; i++)
+		{
+			if (Channels[i].Contains("опия")) { Channels.Remove(Channels[i]);i--; }
+
+		}
+		for (int i = 0; i < Channels.Count; i++)
+		{
+
+		 
+			Channels[i] = Channels[i].Substring(0, Channels[i].Length - 8);
+
+		}
+		List<string> UniqueChannels = new List<string>();
+		for (int i = 0; i <Channels.Count; i++)
+		{
+			if (!UniqueChannels.Contains(Channels[i])) UniqueChannels.Add(Channels[i]);
+		}
+		joba.RenderChannels = UniqueChannels.ToArray();
+	}
+	static void GetDirectorySize(Job joba)
+	{
+		// Part 1: get info.
+		DirectoryInfo directoryInfo = new DirectoryInfo(joba.RenderPath);
+		FileSystemInfo[] array = directoryInfo.GetFileSystemInfos();
+
+		// Part 2: sum all FileInfo Lengths.
+		double sum = 0;
+		for (int i = 0; i < array.Length; i++)
+		{
+			FileInfo fileInfo = array[i] as FileInfo;
+			if (fileInfo != null)
+			{
+				sum += (int)fileInfo.Length;
+			}
+		}
+		joba.FullRendersSize = sum;
+		Console.WriteLine("All Renders Size: " + (joba.FullRendersSize / (1024d*1024d*1024d)).ToString());
+		
+		joba.OneFrameSize = sum/joba.RenderChannels.Length;
+		Console.WriteLine("One Frame:  " + (joba.OneFrameSize / (1024d * 1024d * 1024d) ).ToString());
+
 
 	}
 
 
 
 
- static void TryParseOtherFrames(Job joba)
+	static void TryParseOtherFrames(Job joba)
 	{
 			int z = 0;
 			Console.WriteLine("\n Проверяем джобу номер: " + joba.Id.ToString() + " файлов в папке:  " + joba.ExistingFiles.Length+ ":   ");
@@ -102,7 +166,7 @@ public class Job
 				{
 				 
 				Thread newThread = new Thread(Program.RunOperation);
-					Console.WriteLine("Запускаем поток: "+z++);
+				//	Console.WriteLine("Запускаем поток: "+z++);
 
 					Program.GenerateFromToFFmpegJpg(joba.ExistingFiles[j],joba);
 
@@ -112,7 +176,7 @@ public class Job
 			
 			 
 			}
-		CheckSequence(joba);
+		
 			 
 				 
 		  
@@ -120,26 +184,32 @@ public class Job
 
  
 	 
-	  static string GenerateMov(Job job)
+	/*  static string GenerateMov(Job job)
 	{
 		string offset = " -start_number " + job.MinimumFrameRendered;
 
 
-		// -vf scale = 320:-1 "- vf scale = 320:-1, "+ + GammaCorretion
-		string tmp = offset + " -i  " + job.RenderNameMask+"%04d" + "-y " + job.ServerPreviewMovFilePath;
+		// -vf scale = 320:-1 "- vf scale = 320:-1, "+ + GammaCorretion + job.Id.ToString()+"_"
+		string tmp = offset + " -i  " +job.RenderNameMask+"%04d" + "-y " + job.ServerPreviewMovFilePath;
 		Console.WriteLine("\nFFMPEG:  " + tmp + "\n");
 		_ = Program.RunFFMpeg(tmp);
 		return tmp;
-	}
+	}*/
 	 
 	  static void CheckSequence(Job job)
-	{
+	{if (job.Id == 5)
+		{
+
+		}
 		int SequenceCounter = 0;
 		foreach (var item in job.ExistingFiles)
 		{
 			int framenumber = RenderTask.GetFrameNumberFromFileName(item);
-			if (job.MaximumFrameRendered < framenumber) job.MaximumFrameRendered = framenumber;
-			if (job.MinimumFrameRendered > framenumber) job.MinimumFrameRendered = framenumber;
+			if (framenumber <100000)
+			{
+				if (job.MaximumFrameRendered < framenumber) job.MaximumFrameRendered = framenumber;
+				if (job.MinimumFrameRendered > framenumber) job.MinimumFrameRendered = framenumber;
+			}
 		}
 		
 		string Frame = "";
@@ -154,11 +224,11 @@ public class Job
 			else
 			{
 
-				if (SequenceCounter > 1)
+				if (SequenceCounter > 0)
 				{
 					if (job.LastMovFramesCounter != j)
 					{
-						Console.WriteLine("\nЕбушки воробушки, охуенный мов рендерим: " + job.MinimumFrameRendered.ToString() + "-" + job.MaximumFrameRendered.ToString());
+						Console.WriteLine("\nGenerating MOV: "+ job.Id+" " + job.MinimumFrameRendered.ToString() + "-" + job.MaximumFrameRendered.ToString());
 
 						_ = GenerateMovFile(job, Frame, job.MinimumFrameRendered, j);
 						job.LastMovFramesCounter = j;
@@ -178,10 +248,18 @@ public class Job
 
 	}
 	
+	static void SyncJob(Job joba)
+	{
+		for (int i = 0; i < joba.ExistingFiles.Length; i++)
+		{
+
+		}
+	}
+	 
 	 static void SaveJobJson(Job job)
 	{
 		string output = JsonConvert.SerializeObject(job);
-		File.WriteAllText(Path.Combine(FarmSettings.JobsDirectory,  (job.Id.ToString()+"_"+ job.RenderNameMask + ".json")), output);
+		File.WriteAllText(Path.Combine(FarmSettings.JobsDirectory,  (job.Id.ToString()+"_"+ ".json")), output);
 		Console.ForegroundColor = ConsoleColor.DarkGreen;
 		Console.WriteLine("\nЗаписываем JsonJob: " + job.RenderNameMask);
 		Console.ForegroundColor = ConsoleColor.White;
@@ -194,19 +272,23 @@ public class Job
 	}
 	  static string GenerateMovFile(Job job,string path,int startFrame,int CountOfFrames)
 	{
+		if (job.Id == 10)
+		{
+
+		}
 		string filemask = Path.GetFileNameWithoutExtension(path);
 		filemask = filemask.Substring(0, filemask.Length - 4);
-		string output = RenderTask.GetServerPreviewFileNameByOriginalFileName( filemask,job);
-		output = (output.Substring(0, output.Length - 3))+".mov ";
-		path = path.Substring(0, output.Length -5) + "%04d.jpg";
-		path = " -i " + path + " " + output;
+		string OutputMov = RenderTask.GetServerPreviewFileNameByOriginalFileName( filemask);
+		
+		path = path.Substring(0, path.Length -8) + "%04d.jpg";
+	
 		string offset = " -start_number " + job.MinimumFrameRendered;
 
-
-		// -vf scale = 320:-1 "- vf scale = 320:-1, "+ + GammaCorretion
+		OutputMov = (OutputMov.Substring(0, OutputMov.Length - 3)) + ".mov ";
+		path = " -i " + path + " " + job.ServerPreviewMovFilePath;
 		string tmp = offset + path   + " -y ";
 		Program.RunFFMpeg(tmp);
-
+		Console.WriteLine("Mov: " + job.RenderPath);
 		
 
 
