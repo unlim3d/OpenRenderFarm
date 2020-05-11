@@ -24,6 +24,7 @@ public class Job
 	public string[] ExistingFiles;
 	public string[] RenderChannels;
 	public int[] FramesPreviewsOnServer;	 
+	public List<string> FramesMissed;	 
 	
 	public string Renderer;
 	public  int LastMovFramesCounter=0;
@@ -37,6 +38,7 @@ public class Job
 	private string _RenderNameMask;
 	public double FullRendersSize;
 	public double OneFrameSize;
+	public bool MovRendered =false;
 	public string RenderNameMask
 	{
 		set
@@ -83,22 +85,22 @@ public class Job
 				Joba.ExistingFiles = Program.SearchFile(Joba.RenderPath, "*" + Joba.RenderNameMask + "*");
 
 
-				SaveJobJson(Joba);
+			
 				TryParseOtherFrames(Joba);
 				CheckSequence(Joba);
 				GetChannels(Joba);
-			 	GetDirectorySize(Joba);
+				GetDirectorySize(Joba);
+				SaveJobJson(Joba);
 			}
 		}
 
 	}
 
+
+	
 	static void GetChannels(Job joba)
 	{
-		if (joba.Id == 3)
-		{
-
-		}
+	
 
 
 
@@ -156,15 +158,16 @@ public class Job
 	{
 			int z = 0;
 			Console.WriteLine("\n Проверяем джобу номер: " + joba.Id.ToString() + " файлов в папке:  " + joba.ExistingFiles.Length+ ":   ");
-			for (int j = 0; j < joba.ExistingFiles.Length; j++)
+			Console.WriteLine(0);
+		for (int j = 0; j < joba.ExistingFiles.Length; j++)
 			{
 				if (File.Exists(RenderTask.GetServerPreviewFileNameByOriginalFileName(joba.ExistingFiles[j],joba)))
 				{
-				Console.Write("*");
+				Console.Write("*"+j);
 				}
 				else
 				{
-				 
+				Console.WriteLine(j);
 				Thread newThread = new Thread(Program.RunOperation);
 				//	Console.WriteLine("Запускаем поток: "+z++);
 
@@ -173,9 +176,9 @@ public class Job
 
 				newThread.Start(Program.GenerateFromToFFmpegJpg(joba.ExistingFiles[j] , joba));
 				}
-			
-			 
-			}
+
+			Tools.ClearCurrentConsoleLine();
+		}
 		
 			 
 				 
@@ -197,7 +200,8 @@ public class Job
 	}*/
 	 
 	  static void CheckSequence(Job job)
-	{if (job.Id == 5)
+	{
+		if (job.Id == 2)
 		{
 
 		}
@@ -211,7 +215,8 @@ public class Job
 				if (job.MinimumFrameRendered > framenumber) job.MinimumFrameRendered = framenumber;
 			}
 		}
-		
+		job.FramesMissed = new List<string>();
+		job.MovRendered = false;
 		string Frame = "";
 		for (int j = job.MinimumFrameRendered; j <=job.MaximumFrameRendered; j++)
 		{
@@ -223,14 +228,15 @@ public class Job
 			if (File.Exists(Frame)) SequenceCounter++;
 			else
 			{
-
-				if (SequenceCounter > 0)
+				job.FramesMissed.Add(Frame);
+				if (  job.MovRendered==false)
 				{
 					if (job.LastMovFramesCounter != j)
 					{
 						Console.WriteLine("\nGenerating MOV: "+ job.Id+" " + job.MinimumFrameRendered.ToString() + "-" + job.MaximumFrameRendered.ToString());
 
-						_ = GenerateMovFile(job, Frame, job.MinimumFrameRendered, j);
+						 GenerateMovFile(job, Frame, job.MinimumFrameRendered, j);
+						job.MovRendered = true;
 						job.LastMovFramesCounter = j;
 					}
 					else
@@ -239,12 +245,16 @@ public class Job
 					}
 				}
 
-				break;
+				 
 			}
-			if (j == job.MaximumFrameRendered)
-				_ = GenerateMovFile(job, Frame, job.MinimumFrameRendered, j);
+			if (SequenceCounter >= job.MaximumFrameRendered)
+			{
+				job.MovRendered = true;
+				GenerateMovFile(job, Frame, job.MinimumFrameRendered, j);
+			}
 
 		}
+		Console.WriteLine("Пропущенных кадров: " + job.FramesMissed.Count);
 
 	}
 	
@@ -280,7 +290,7 @@ public class Job
 		filemask = filemask.Substring(0, filemask.Length - 4);
 		string OutputMov = RenderTask.GetServerPreviewFileNameByOriginalFileName( filemask);
 		
-		path = path.Substring(0, path.Length -8) + "%04d.jpg";
+		path = path.Substring(0, path.Length -8) + "%04d.jpg -vframes "+(job.MaximumFrameRendered-job.MinimumFrameRendered+1);
 	
 		string offset = " -start_number " + job.MinimumFrameRendered;
 
@@ -312,22 +322,22 @@ public class Job
 		}
 
 		List<string> UniquePaths = new List<string>();
-        for (int i = 0; i < checkedstr.Count; i++)
-        {
-            string[] str = Directory.GetFiles(checkedstr[i], "*RGB_color.*", SearchOption.AllDirectories);
+		for (int i = 0; i < checkedstr.Count; i++)
+		{
+			string[] str = Directory.GetFiles(checkedstr[i], "*RGB_color.*", SearchOption.AllDirectories);
 
-            if (str.Length != 0)
-                for (int j = 0; j < str.Length; j++)
-                {
-                    string temp = str[j].Substring(0, str[j].Length - 8);
-                    if (!UniquePaths.Contains(temp))
-                    {
-                        UniquePaths.Add(temp);
-                        CheckJobName(str[j]);
-                    }
-                }
-        }
-        }
+			if (str.Length != 0)
+				for (int j = 0; j < str.Length; j++)
+				{
+					string temp = str[j].Substring(0, str[j].Length - 8);
+					if (!UniquePaths.Contains(temp))
+					{
+						UniquePaths.Add(temp);
+						CheckJobName(str[j]);
+					}
+				}
+		}
+		}
 	
 		
 		 
