@@ -94,7 +94,7 @@ const BuildPage = function () {
             button_save.setAttribute('class', 'save_btn');
             button_save.innerText = 'Set save path';
             button_save.onclick = () => {
-                const body = {sequence: ids[i]};
+                const body = {id: ids[i]};
                 if (path_field.value) body.path = path_field.value;
                 MakeProgramRequest({name: 'SetRenderFolder', body: body});
             };
