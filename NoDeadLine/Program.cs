@@ -131,7 +131,15 @@ class Program
       //  Console.WriteLine("\nFFMPEG:  " + tmp + "\n");
         return tmp;
     }
- 
+    public static string GenerateFromMissedToServerPreviewFrame( Job Joba, string Frame)
+    {
+
+
+        string tmp = " -i  " + FarmSettings.MissedFrameFile + " -s 640:360 " + "-y " + Frame;
+        //  Console.WriteLine("\nFFMPEG:  " + tmp + "\n");
+        RunFFMpeg(tmp);
+        return tmp;
+    }
     public static string RunFFMpeg(string parametres)
     {
         ChangedCountFiles++;

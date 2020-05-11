@@ -69,6 +69,14 @@ public class Tools
 		}
 		 
 	}
+	public static bool FilesEqual(string SourceFile,string OutputFile)
+	{
+		if (!File.Exists(OutputFile)) return false;
+		long length = new System.IO.FileInfo(OutputFile).Length;
+		if (length < 20000) return false;
+
+		return true;
+	}
 
 }
 	

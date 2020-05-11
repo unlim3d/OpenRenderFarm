@@ -9,6 +9,7 @@ using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using System.Threading;
 using System.Threading.Tasks;
+ 
 
 public class Job
 {
@@ -36,6 +37,7 @@ public class Job
 	public string CollectPath = "";
 	public string ServerPreviewMovFilePath;
 	private string _RenderNameMask;
+	public string FileFormat;
 	public double FullRendersSize;
 	public double OneFrameSize;
 	public bool MovRendered =false;
@@ -90,6 +92,7 @@ public class Job
 				CheckSequence(Joba);
 				GetChannels(Joba);
 				GetDirectorySize(Joba);
+				GetFileFormat(Joba);
 				SaveJobJson(Joba);
 			}
 		}
@@ -158,28 +161,27 @@ public class Job
 	{
 			int z = 0;
 			Console.WriteLine("\n Проверяем джобу номер: " + joba.Id.ToString() + " файлов в папке:  " + joba.ExistingFiles.Length+ ":   ");
-			Console.WriteLine(0);
-		for (int j = 0; j < joba.ExistingFiles.Length; j++)
-			{
-				if (File.Exists(RenderTask.GetServerPreviewFileNameByOriginalFileName(joba.ExistingFiles[j],joba)))
-				{
-				Console.Write("*"+j);
-				}
-				else
-				{
-				Console.WriteLine(j);
-				Thread newThread = new Thread(Program.RunOperation);
-				//	Console.WriteLine("Запускаем поток: "+z++);
-
-					Program.GenerateFromToFFmpegJpg(joba.ExistingFiles[j],joba);
-
-
-				newThread.Start(Program.GenerateFromToFFmpegJpg(joba.ExistingFiles[j] , joba));
-				}
-
-			Tools.ClearCurrentConsoleLine();
-		}
 		
+		for (int j = 0; j < joba.ExistingFiles.Length; j++)
+		{
+			//if (File.Exists(RenderTask.GetServerPreviewFileNameByOriginalFileName(joba.ExistingFiles[j],joba)))
+			if (Tools.FilesEqual(joba.ExistingFiles[j], RenderTask.GetServerPreviewFileNameByOriginalFileName(joba.ExistingFiles[j], joba)))
+				Console.Write("*" );
+			else
+			{
+				
+				Thread newThread = new Thread(Program.RunOperation);
+					Console.Write("Запускаем поток: "+z++);
+
+				Program.GenerateFromToFFmpegJpg(joba.ExistingFiles[j], joba);
+				 
+				 
+				newThread.Start(Program.GenerateFromToFFmpegJpg(joba.ExistingFiles[j], joba));
+
+				Tools.ClearCurrentConsoleLine();
+				
+			}
+		}
 			 
 				 
 		  
@@ -218,17 +220,33 @@ public class Job
 		job.FramesMissed = new List<string>();
 		job.MovRendered = false;
 		string Frame = "";
+
+
+		if (job.Id == 3)
+		{
+
+		}
 		for (int j = job.MinimumFrameRendered; j <=job.MaximumFrameRendered; j++)
 		{
 			Frame = j.ToString();
 			if (Frame.Length == 1) Frame = "000" + Frame;
 			if (Frame.Length == 2) Frame = "00" + Frame;
 			if (Frame.Length == 3) Frame = "0" + Frame;
+			string tempFrameId = Frame;
 			Frame = RenderTask.GetServerPreviewFileNameByOriginalFileName( job.RenderNameMask + Frame + ".jpg",job);
+			
+			
+			// проверка  на новизну ебаную
 			if (File.Exists(Frame)) SequenceCounter++;
+
+
+
 			else
 			{
 				job.FramesMissed.Add(Frame.Substring(Frame.Length-8,4));
+				Program.GenerateFromMissedToServerPreviewFrame(job, Frame);
+					 SequenceCounter++;
+				/*
 				if (  job.MovRendered==false)
 				{
 					if (job.LastMovFramesCounter != j)
@@ -245,9 +263,9 @@ public class Job
 					}
 				}
 
-				 
+				*/
 			}
-			if (SequenceCounter >= job.MaximumFrameRendered)
+			if (SequenceCounter >= (job.MaximumFrameRendered-job.MinimumFrameRendered))
 			{
 				job.MovRendered = true;
 				GenerateMovFile(job, Frame, job.MinimumFrameRendered, j);
@@ -290,8 +308,8 @@ public class Job
 		filemask = filemask.Substring(0, filemask.Length - 4);
 		string OutputMov = RenderTask.GetServerPreviewFileNameByOriginalFileName( filemask);
 		
-		path = path.Substring(0, path.Length -8) + "%04d.jpg -vframes "+(job.MaximumFrameRendered-job.MinimumFrameRendered+1);
-	
+		path = path.Substring(0, path.Length -8) + "%04d.jpg ";//-vframes "+(job.MaximumFrameRendered-job.MinimumFrameRendered+1)
+
 		string offset = " -start_number " + job.MinimumFrameRendered;
 
 		OutputMov = (OutputMov.Substring(0, OutputMov.Length - 3)) + ".mov ";
@@ -303,6 +321,12 @@ public class Job
 
 
 		return null;
+	}
+
+	public static void GetFileFormat(Job joba)
+	{
+		if (joba.ExistingFiles.Length>0)
+		joba.FileFormat = joba.ExistingFiles[0].Substring(joba.ExistingFiles[0].Length-3,3);
 	}
 
 	public static string FindVrayRGBColorRenderMask(string path)
