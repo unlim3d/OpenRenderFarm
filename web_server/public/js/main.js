@@ -81,7 +81,7 @@ const BuildPage = function () {
                 if (sequence_info.hasOwnProperty('min_frame_rendered') && sequence_info.hasOwnProperty('max_frame_rendered')){
                     const render_path = document.createElement('div');
                     render_path.setAttribute('class', 'render_info');
-                    render_path.innerText = "Files Number: " + (sequence_info.max_frame_rendered - sequence_info.min_frame_rendered);
+                    render_path.innerText = "Files Number: " + (sequence_info.max_frame_rendered - sequence_info.min_frame_rendered + 1);
                     td.appendChild(render_path);
                 }
             }
