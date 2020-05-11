@@ -228,7 +228,7 @@ public class Job
 			if (File.Exists(Frame)) SequenceCounter++;
 			else
 			{
-				job.FramesMissed.Add(Frame);
+				job.FramesMissed.Add(Frame.Substring(Frame.Length-8,4));
 				if (  job.MovRendered==false)
 				{
 					if (job.LastMovFramesCounter != j)
