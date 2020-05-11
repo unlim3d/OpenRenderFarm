@@ -9,7 +9,7 @@
     text-align: left;
     color: white;
 }
-#table td div{
+.frame_info{
     word-break: break-all;
     width: 90%;
     position: absolute;
@@ -19,10 +19,13 @@
 #table td:hover div{
     display: block;
 }
-#table .save_btn{
+#table button{
     width: 90%;
     height: 2em;
 }
 #table input[type="text"]{
     width: 90%;
+}
+.render_info{
+    color: black;
 }

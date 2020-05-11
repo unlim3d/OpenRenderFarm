@@ -1,11 +1,27 @@
+const CopyToClipboard = function(text) {
+    const element = document.createElement('div');
+    element.innerText = text;
+    document.body.appendChild(element);
+    const range = document.createRange();
+    range.selectNode(element);
+    window.getSelection().removeAllRanges(); // clear current selection
+    window.getSelection().addRange(range); // to select text
+    document.execCommand("copy");
+    window.getSelection().removeAllRanges();// to deselect
+    document.body.removeChild(element);
+};
+
 const BuildPage = function () {
     let files = JSON.parse(document.getElementById('files').textContent);
+    let sequences_info = JSON.parse(document.getElementById('sequences_info').textContent);
+    if (!sequences_info || sequences_info[0]) sequences_info = {};
+    else sequences_info = sequences_info[1];
 
     const table = document.getElementById('table');
 
-    const sequences = files[1][0];
-    if (!files[0] && sequences.length > 0){
+    if (!files[0] && files[1][0].length > 0){
         files = files[1];
+        const sequences = files[0];
         let tr = document.createElement('tr');
         for (let i = 0; i < sequences.length; i++){
             const th = document.createElement('th');
@@ -32,6 +48,23 @@ const BuildPage = function () {
                 td.appendChild(video);
             }
 
+            const sequence_info = sequences_info[sequences[i]];
+            if (sequence_info) {
+                if (sequence_info.hasOwnProperty('full_renders_size')) {
+                    const render_size_info = document.createElement('div');
+                    render_size_info.setAttribute('class', 'render_info');
+                    render_size_info.innerText = "Full Renders Size: " + (sequence_info.full_renders_size / 1024 / 1024 / 1024).toLocaleString(undefined, {maximumFractionDigits: 2}) + "GB.";
+                    td.appendChild(render_size_info);
+                }
+
+                if (sequence_info.hasOwnProperty('render_path')) {
+                    const render_path = document.createElement('div');
+                    render_path.setAttribute('class', 'render_info');
+                    render_path.innerText = "Render Path: " + sequence_info.render_path;
+                    td.appendChild(render_path);
+                }
+            }
+
             const path_field = document.createElement('input');
             path_field.setAttribute('type', 'text');
             td.appendChild(path_field);
@@ -45,6 +78,22 @@ const BuildPage = function () {
                 MakeProgramRequest({name: 'SetRenderFolder', body: body});
             };
             td.appendChild(button_save);
+
+            if (sequence_info) {
+                if (sequence_info.hasOwnProperty('frames_missed') && sequence_info.frames_missed.length > 0) {
+                    const missed_btn = document.createElement('button');
+                    missed_btn.setAttribute('class', 'missed_btn');
+                    missed_btn.innerText = 'Copy missed frames: ' + sequence_info.frames_missed.length;
+                    if (sequence_info.hasOwnProperty('min_frame_rendered') && sequence_info.hasOwnProperty('max_frame_rendered')){
+                        missed_btn.innerText += " (" + (sequence_info.frames_missed.length / (sequence_info.max_frame_rendered - sequence_info.min_frame_rendered) * 100).toLocaleString(undefined, {maximumFractionDigits: 2}) + "%)";
+                    }
+                    missed_btn.onclick = () => {
+                        const clipboard = sequence_info.frames_missed.reduce((acc, cur) => acc === '' ? cur : cur + ',' + acc, '');
+                        CopyToClipboard(clipboard);
+                    };
+                    td.appendChild(missed_btn);
+                }
+            }
 
             tr.appendChild(td);
             table.appendChild(tr);
@@ -71,6 +120,7 @@ const BuildPage = function () {
                         for (let k = 0; k < fields.length; k++){
                             const val = file.data[fields[k]];
                             const div = document.createElement('div');
+                            div.setAttribute('class', 'frame_info');
                             div.innerText = fields[k] + ': ' + val;
                             div.setAttribute('style', 'top: ' + ((k + .5) * 1.5) + 'em');
                             td.appendChild(div);
@@ -82,6 +132,7 @@ const BuildPage = function () {
 
                 if (!file || !file.data){
                     const div = document.createElement('div');
+                    div.setAttribute('class', 'frame_info');
                     div.innerText = 'No Such Info';
                     div.setAttribute('style', 'top: 1.5em');
                     td.appendChild(div);

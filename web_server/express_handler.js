@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 const config = require('./config');
 const utils = require('./utils');
@@ -10,7 +11,6 @@ const ReadRenderedFiles = async function (req, res){
 
     const postfix_length = 4;
 
-    //
     let files = await utils.GetFiles(config.files_path);
     if (files[0]){
         res.render(config.views_path + 'main', {files: JSON.stringify(files)});
@@ -114,7 +114,40 @@ const ReadRenderedFiles = async function (req, res){
         }
     }
 
-    res.render(config.views_path + 'main', {files: JSON.stringify([0, result])});
+    const jobs_path = path.join(config.files_path, './Jobs');
+    files = await utils.GetFiles(jobs_path);
+    if (files[0]){
+        res.render(config.views_path + 'main', {files: JSON.stringify([0, result]), sequences_info: JSON.stringify(files)});
+        console.error(files[1]);
+        return files;
+    }
+    files = files[1];
+
+    let info_json_files = files.filter(x => x.includes('.' + json_format));
+
+    const sequences_info = {};
+    for (let i = 0; i < info_json_files.length; i++){
+        const file = info_json_files[i];
+        let data = await utils.ReadFile(path.join(jobs_path, file));
+        if (data[0]) continue;
+        data = data[1];
+        try {
+            data = JSON.parse(data);
+        }catch (e) {
+            console.error('Wrong JSON format at ' + file + '.');
+            continue;
+        }
+
+        sequences_info[data.RenderNameMask] = {
+            render_path: data.RenderPath,
+            full_renders_size: data.FullRendersSize,
+            frames_missed: data.FramesMissed,
+            min_frame_rendered: data.MinimumFrameRendered,
+            max_frame_rendered: data.MaximumFrameRendered,
+        };
+    }
+
+    res.render(config.views_path + 'main', {files: JSON.stringify([0, result]), sequences_info: JSON.stringify([0, sequences_info])});
     return [0, result];
 };
 
