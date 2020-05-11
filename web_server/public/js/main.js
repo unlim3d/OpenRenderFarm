@@ -60,7 +60,7 @@ const BuildPage = function () {
                 if (sequence_info.hasOwnProperty('frame_size')) {
                     const render_path = document.createElement('div');
                     render_path.setAttribute('class', 'render_info');
-                    render_path.innerText = "Frame Size: " + (sequence_info.frame_size / 1024 / 1024 / 1024).toLocaleString(undefined, {maximumFractionDigits: 3}) + "GB.";
+                    render_path.innerText = "Frame Size: " + (sequence_info.frame_size / 1024 / 1024).toLocaleString(undefined, {maximumFractionDigits: 2}) + "MB.";
                     td.appendChild(render_path);
                 }
 
