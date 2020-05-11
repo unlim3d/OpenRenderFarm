@@ -27,10 +27,10 @@ const ReadRenderedFiles = async function (req, res){
     const stats_promises = [];
     for (let i = 0; i < raw_frames.length; i++){
         let file = raw_frames[i];
-        const wof = file.substr(0, file.length - (frame_format.length + 1));
+        let wof = file.substr(0, file.length - (frame_format.length + 1));
         const info = {};
         info.type = 'frame';
-        info.sequence = wof.substr(0, wof.length - (postfix_length));
+        info.id = wof.split('_')[0];
         info.num = parseInt(wof.substr(wof.length - postfix_length), 10);
         if (isNaN(info.num)) continue;
         info.format = frame_format;
@@ -69,7 +69,7 @@ const ReadRenderedFiles = async function (req, res){
         const info = {};
         info.type = 'video';
         const wof = file.substr(0, file.length - (video_format.length + 1));
-        info.sequence = wof;
+        info.id = wof.split('_')[0];
         info.format = video_format;
         info.filename = wof;
         raw_result.push(info);
@@ -78,13 +78,13 @@ const ReadRenderedFiles = async function (req, res){
     const result = [];
     result[0] = [];
     for (let i = 0; i < raw_result.length; i++){
-        if (!result[0].includes(raw_result[i].sequence)) result[0].push(raw_result[i].sequence);
+        if (!result[0].includes(raw_result[i].id)) result[0].push(raw_result[i].id);
         delete raw_result[i].stats;
     }
 
     result[1] = [];
     for (let i = 0; i < result[0].length; i++){
-        result[1][i] = raw_result.find(x => x.sequence === result[0][i] && x.type === 'video');
+        result[1][i] = raw_result.find(x => x.id === result[0][i] && x.type === 'video');
     }
 
     const frames = raw_result.filter(x => x.type === 'frame');
@@ -92,17 +92,17 @@ const ReadRenderedFiles = async function (req, res){
     const seq_params = {};
     let max_frames = 0;
     for (let i = 0; i < frames.length; i++){
-        if (!seq_frames.hasOwnProperty(frames[i].sequence)){
-            seq_frames[frames[i].sequence] = frames.filter(x => x.sequence === frames[i].sequence).sort((a, b) => b.num - a.num);
+        if (!seq_frames.hasOwnProperty(frames[i].id)){
+            seq_frames[frames[i].id] = frames.filter(x => x.id === frames[i].id).sort((a, b) => b.num - a.num);
 
-            seq_params[frames[i].sequence] = {};
-            seq_params[frames[i].sequence].real_min = seq_frames[frames[i].sequence][seq_frames[frames[i].sequence].length - 1].num;
-            seq_params[frames[i].sequence].max = seq_frames[frames[i].sequence][0].num - seq_params[frames[i].sequence].real_min;
-            seq_params[frames[i].sequence].min = 0;
+            seq_params[frames[i].id] = {};
+            seq_params[frames[i].id].real_min = seq_frames[frames[i].id][seq_frames[frames[i].id].length - 1].num;
+            seq_params[frames[i].id].max = seq_frames[frames[i].id][0].num - seq_params[frames[i].id].real_min;
+            seq_params[frames[i].id].min = 0;
 
-            max_frames = Math.max(max_frames, seq_params[frames[i].sequence].max);
+            max_frames = Math.max(max_frames, seq_params[frames[i].id].max);
 
-            seq_frames[frames[i].sequence] = seq_frames[frames[i].sequence].reduce((acc, cur) => {acc[cur.num - seq_params[frames[i].sequence].real_min] = cur; return acc;}, {});
+            seq_frames[frames[i].id] = seq_frames[frames[i].id].reduce((acc, cur) => {acc[cur.num - seq_params[frames[i].id].real_min] = cur; return acc;}, {});
         }
     }
 
@@ -138,7 +138,9 @@ const ReadRenderedFiles = async function (req, res){
             continue;
         }
 
-        sequences_info[data.RenderNameMask] = {
+        const id = file.split('_')[0];
+        sequences_info[id] = {
+            render_name_mask: data.RenderNameMask,
             render_path: data.RenderPath,
             full_renders_size: data.FullRendersSize,
             frames_missed: data.FramesMissed,

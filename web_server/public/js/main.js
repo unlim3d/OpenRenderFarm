@@ -14,18 +14,18 @@ const CopyToClipboard = function(text) {
 const BuildPage = function () {
     let files = JSON.parse(document.getElementById('files').textContent);
     let sequences_info = JSON.parse(document.getElementById('sequences_info').textContent);
-    if (!sequences_info || sequences_info[0]) sequences_info = {};
-    else sequences_info = sequences_info[1];
+    if (!sequences_info[0]) sequences_info = sequences_info[1];
+    else sequences_info = {};
 
     const table = document.getElementById('table');
 
     if (!files[0] && files[1][0].length > 0){
         files = files[1];
-        const sequences = files[0];
+        const ids = files[0];
         let tr = document.createElement('tr');
-        for (let i = 0; i < sequences.length; i++){
+        for (let i = 0; i < ids.length; i++){
             const th = document.createElement('th');
-            th.innerText = sequences[i];
+            th.innerText = sequences_info[ids[i]].render_name_mask || "ID: " + ids[i];
             tr.appendChild(th);
         }
         table.appendChild(tr);
@@ -48,7 +48,7 @@ const BuildPage = function () {
                 td.appendChild(video);
             }
 
-            const sequence_info = sequences_info[sequences[i]];
+            const sequence_info = sequences_info[ids[i]];
             if (sequence_info) {
                 if (sequence_info.hasOwnProperty('full_renders_size')) {
                     const render_size_info = document.createElement('div');
@@ -73,7 +73,7 @@ const BuildPage = function () {
             button_save.setAttribute('class', 'save_btn');
             button_save.innerText = 'Set save path';
             button_save.onclick = () => {
-                const body = {sequence: sequences[i]};
+                const body = {sequence: ids[i]};
                 if (path_field.value) body.path = path_field.value;
                 MakeProgramRequest({name: 'SetRenderFolder', body: body});
             };
