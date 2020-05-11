@@ -25,7 +25,7 @@ const BuildPage = function () {
         let tr = document.createElement('tr');
         for (let i = 0; i < ids.length; i++){
             const th = document.createElement('th');
-            th.innerText = sequences_info[ids[i]].render_name_mask || "ID: " + ids[i];
+            th.innerText = (sequences_info[ids[i]] || {}).render_name_mask || "ID: " + ids[i];
             tr.appendChild(th);
         }
         table.appendChild(tr);
