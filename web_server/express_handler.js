@@ -146,6 +146,7 @@ const ReadRenderedFiles = async function (req, res){
             frames_missed: data.FramesMissed,
             min_frame_rendered: data.MinimumFrameRendered,
             max_frame_rendered: data.MaximumFrameRendered,
+            file_format: data.FileFormat,
         };
     }
 

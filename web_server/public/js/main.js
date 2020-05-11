@@ -25,7 +25,7 @@ const BuildPage = function () {
         let tr = document.createElement('tr');
         for (let i = 0; i < ids.length; i++){
             const th = document.createElement('th');
-            th.innerText = (sequences_info[ids[i]] || {}).render_name_mask || "ID: " + ids[i];
+            th.innerText = (sequences_info[ids[i]] || {}).render_name_mask + " (" + ids[i] + ")" || "ID: " + ids[i];
             tr.appendChild(th);
         }
         table.appendChild(tr);
@@ -61,6 +61,13 @@ const BuildPage = function () {
                     const render_path = document.createElement('div');
                     render_path.setAttribute('class', 'render_info');
                     render_path.innerText = "Render Path: " + sequence_info.render_path;
+                    td.appendChild(render_path);
+                }
+
+                if (sequence_info.hasOwnProperty('file_format')) {
+                    const render_path = document.createElement('div');
+                    render_path.setAttribute('class', 'render_info');
+                    render_path.innerText = "File Format: " + sequence_info.file_format;
                     td.appendChild(render_path);
                 }
             }
