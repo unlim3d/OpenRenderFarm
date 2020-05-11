@@ -143,6 +143,7 @@ const ReadRenderedFiles = async function (req, res){
             render_name_mask: data.RenderNameMask,
             render_path: data.RenderPath,
             full_renders_size: data.FullRendersSize,
+            frame_size: data.OneFrameSize,
             frames_missed: data.FramesMissed,
             min_frame_rendered: data.MinimumFrameRendered,
             max_frame_rendered: data.MaximumFrameRendered,

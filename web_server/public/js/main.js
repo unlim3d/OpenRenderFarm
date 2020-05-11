@@ -57,6 +57,13 @@ const BuildPage = function () {
                     td.appendChild(render_size_info);
                 }
 
+                if (sequence_info.hasOwnProperty('frame_size')) {
+                    const render_path = document.createElement('div');
+                    render_path.setAttribute('class', 'render_info');
+                    render_path.innerText = "Frame Size: " + (sequence_info.frame_size / 1024 / 1024 / 1024).toLocaleString(undefined, {maximumFractionDigits: 3}) + "GB.";
+                    td.appendChild(render_path);
+                }
+
                 if (sequence_info.hasOwnProperty('render_path')) {
                     const render_path = document.createElement('div');
                     render_path.setAttribute('class', 'render_info');
@@ -68,6 +75,13 @@ const BuildPage = function () {
                     const render_path = document.createElement('div');
                     render_path.setAttribute('class', 'render_info');
                     render_path.innerText = "File Format: " + sequence_info.file_format;
+                    td.appendChild(render_path);
+                }
+
+                if (sequence_info.hasOwnProperty('min_frame_rendered') && sequence_info.hasOwnProperty('max_frame_rendered')){
+                    const render_path = document.createElement('div');
+                    render_path.setAttribute('class', 'render_info');
+                    render_path.innerText = "Files Number: " + (sequence_info.max_frame_rendered - sequence_info.min_frame_rendered);
                     td.appendChild(render_path);
                 }
             }
