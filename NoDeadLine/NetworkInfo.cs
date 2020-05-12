@@ -13,29 +13,47 @@ namespace NoDeadLine
     {
         public string addressIP = "";
         private string fileName = "";
-        public void SaveFromCmd()
+        private bool _isReport = false;
+        public void SaveFromCmd(bool isReport)
         {
             bool isWindows = System.Runtime.InteropServices.RuntimeInformation
                 .IsOSPlatform(OSPlatform.Windows);
             if (isWindows)
             {
+                _isReport = isReport;
                 System.Diagnostics.Process process = new System.Diagnostics.Process();
                 System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
                 startInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
                 startInfo.WorkingDirectory = @"C:\Windows\System32";
                 startInfo.FileName = @"C:\Windows\System32\cmd.exe";
-                fileName = DateTime.Now.ToString("yyyyMMddHHmmss") + "Network" + ".json";
-                startInfo.Arguments = @"/C " + "cd " + FarmSettings.NetworkInfoCommandLine + " & " + "speedtest.exe " +
+                if (isReport)
+                {
+                    fileName = DateTime.Now.ToString("yyyyMMddHHmmss") + "Network" + ".json";
+
+                   
+                }
+                else
+                {
+                    fileName = GetNetworkInfo() + "networkpool.json";
+
+                    
+                }
+
+                startInfo.Arguments = @"/C " + "cd " + FarmSettings.NetworkInfoCommandLine + " & " +
+                                      "speedtest.exe " +
                                       "> " + fileName;
+                process.Exited += Process_Exited;
                 process.StartInfo = startInfo;
 
                 process.EnableRaisingEvents = true;
-                process.Exited += Process_Exited;
+               
 
                 process.Start();
                 AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
             }
         }
+
+        
 
         private void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
@@ -52,12 +70,34 @@ namespace NoDeadLine
         private void Process_Exited(object sender, EventArgs e)
         {
             string pathStart = FarmSettings.NetworkInfoCommandLine + "\\" + fileName;
-            string pathEnd = FarmSettings.DeadLineReportFolderWin + "\\" + fileName ;
+            string pathEnd = "";
+
+            if (_isReport)
+            {
+                pathEnd= FarmSettings.DeadLineReportFolderWin + "\\" + fileName;
+            }
+            else
+            {
+                pathEnd=FarmSettings.NetworkPool + "\\" + fileName;
+            }
+
             try
             {
                 if (File.Exists(pathStart))
                 {
-                    File.Move(pathStart, pathEnd);
+                    if (_isReport)
+                    {
+                        File.Move(pathStart, pathEnd);
+                    }
+                    else
+                    {
+                        if (File.Exists(pathEnd))
+                        {
+                            File.Delete(pathEnd);
+                        }
+                        File.Move(pathStart, pathEnd);
+                    }
+
                     File.AppendAllText(pathEnd,"IPAddress : "+GetNetworkInfo());
                 }
             }
