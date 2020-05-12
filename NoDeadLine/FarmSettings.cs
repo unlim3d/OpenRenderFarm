@@ -54,6 +54,7 @@ public class FarmSettings
             return tempDirectory;
         }
     }
+
     public static string SitePath
     {
         get
@@ -81,7 +82,19 @@ public class FarmSettings
             return Directory.GetDirectories(Resources, "BaseDesignElements")[0];
         }
     }
+    public static string NetworkPool
+    {
+        get
+        {
+            string tempDirectory = Path.Combine(Resources, "networkpool");//Directory.GetDirectories(WebServer, "BaseDesignElements")[0];
+            if (!Directory.Exists(tempDirectory))
+            {
+                Directory.CreateDirectory(tempDirectory);
+            }
 
+            return Directory.GetDirectories(Resources, "networkpool")[0];
+        }
+    }
     public static string DeadLineReportFolderSlaves
     {
         get

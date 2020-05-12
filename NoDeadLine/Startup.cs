@@ -30,7 +30,10 @@ public class StartUp
         hardware.StartCmd();
 
         NetworkInfo network = new NetworkInfo();
-        network.SaveFromCmd();
+        network.SaveFromCmd(true);
+
+        NetworkInfo networkNet = new NetworkInfo();
+        networkNet.SaveFromCmd(false);
     }
 private static void CopyAddDirectoryImage()
     {
