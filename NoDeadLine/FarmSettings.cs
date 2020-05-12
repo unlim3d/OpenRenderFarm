@@ -181,5 +181,20 @@ public class FarmSettings
         }
 
     }
+
+    private static  string _missedFrame;
+    public static string MissedFrameFile
+    {
+        get
+        {
+            if(_missedFrame==null)
+            _missedFrame= Directory.GetFiles(BaseDesignElements, "*MissedFrame")[0];
+            if (_missedFrame == null)
+            {
+                Console.WriteLine("Error: cant find missedFrame.jpg");
+            }
+            return _missedFrame;
+        }
+    }
 }
  
