@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Windows;
 using Newtonsoft.Json;
+
 
 namespace PathSaver
 {
@@ -55,6 +57,13 @@ namespace PathSaver
                         System.Windows.Application.Current.Shutdown();
                     }
                 }
+
+                if (App.startupArgument == App.StartupArgument.CollectPath)
+                {
+                    ModifyJsonOnId(folder);
+                    System.Windows.Application.Current.Shutdown();
+                }
+
             }
         }
 
@@ -80,35 +89,113 @@ namespace PathSaver
 
 
         }
-        private string GetPathRenderPath()
+
+        private void ModifyJsonOnId(string pathToSave)
         {
-            RootPath();
-            string tempPath = Path.Combine(Resources, "RenderPath");
+            int tempIdJson = 0;
+            string path = "";
+            string[] pathFiles = Directory.GetFiles(GetPahJobs(), "*.json");
+
+            for (int i = 0; i < pathFiles.Length; i++)
+            {
+                string tempString = "";
+
+                tempString = pathFiles[i].Substring(pathFiles[i].LastIndexOf('\\') + 1,
+                    pathFiles[i].LastIndexOf(".json") - pathFiles[i].LastIndexOf('\\'));
+                tempString = tempString.Substring(0, tempString.IndexOf("_"));
+                tempIdJson = int.Parse(tempString);
+                if (App.idCollectPath == tempIdJson)
+                {
+                    path = pathFiles[i];
+                }
+            }
+
+            string textPath = "";
+
+            string text = File.ReadAllText(path);
+            int startOldPath = 0;
+            int endOldPath = 0;
+            startOldPath = text.LastIndexOf("\"CollectPath\":\"") + 15;
+            endOldPath = text.LastIndexOf("\",\"ServerPreviewMovFilePath\"");
+            textPath = text.Substring(startOldPath, endOldPath - startOldPath);
+            if (textPath.Length > 0)
+            {
+                text = text.Replace(textPath, "");
+            }
+            endOldPath = text.LastIndexOf("\",\"ServerPreviewMovFilePath\"");
+            List<char> test=new List<char>();
+            for (int i = 0; i < pathToSave.Length; i++)
+            {
+                test.Add(pathToSave[i]);
+                if (pathToSave[i] == '\\')
+                {
+                    test.Add('\\');
+                }
+            }
+
+            string testString = "";
+            for (int i = 0; i < test.Count; i++)
+            {
+                testString += test[i];
+            }
+            text = text.Insert(endOldPath, testString);
+            File.WriteAllText(path, text);
+        }
+
+        private string GetPahJobs()
+        {
+            RootPathSite();
+            string tempPath = Path.Combine(Root, "Jobs");
             if (!Directory.Exists(tempPath))
             {
                 Directory.CreateDirectory(tempPath);
             }
             return tempPath;
         }
-        public static void RootPath()
+        private string GetPathRenderPath()
         {
-            if (Directory.GetDirectories(Resources, "PathsSaver").Length > 0)
+            RootPathResources();
+            string tempPath = Path.Combine(Root, "RenderPath");
+            if (!Directory.Exists(tempPath))
             {
-                Resources = Resources;
+                Directory.CreateDirectory(tempPath);
+            }
+            return tempPath;
+        }
+        public static void RootPathResources()
+        {
+            if (Directory.GetDirectories(Root, "PathsSaver").Length > 0)
+            {
+                Root = Root;
 
             }
             else
             {
-                Resources = Resources.Substring(0, Resources.LastIndexOf("\\"));
-                RootPath();
+                Root = Root.Substring(0, Root.LastIndexOf("\\"));
+                RootPathResources();
             }
 
         }
-        private static string _resources = Directory.GetCurrentDirectory();
-        public static string Resources
+
+        public static void RootPathSite()
         {
-            get { return _resources; }
-            set { _resources = value; }
+            if (Directory.GetDirectories(Root, "Resources").Length > 0)
+            {
+                Root = Root;
+
+            }
+            else
+            {
+                Root = Root.Substring(0, Root.LastIndexOf("\\"));
+                RootPathSite();
+            }
+        }
+
+        private static string _root = Directory.GetCurrentDirectory();
+        public static string Root
+        {
+            get { return _root; }
+            set { _root = value; }
         }
 
     }
