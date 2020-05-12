@@ -12,8 +12,7 @@ namespace OpenRenderFarmAutoUpdater
 
             System.Threading.Thread.Sleep(2000);
         
-                Paths.UninstallAll();
-            //  Paths.Install();
+             
             Paths.DownloadNewVersionOfBuild();
 
 

@@ -27,15 +27,104 @@ public class Paths
 			return InstalledPath;
 		}
 	}
+	public static string ResourcesFolder
+	{
+		get
+		{
+			string res = Directory.GetDirectories(Root, "*web_server*")[0];
+			res = Directory.GetDirectories(res, "*Site*")[0];
+			res = Directory.GetDirectories(res, "*Resources*")[0];
+			return res;
+		}
+	}
+	public static string NewVersionZip { get; private set; }
+
 	public static List<string> Pools = new List<string>();
 	public static List<string> Builds = new List<string>();
 	public static void Install()
 	{
-		 
+		UninstallAll();
+		Environment.SetEnvironmentVariable("OpenRenderFarm", Root, EnvironmentVariableTarget.User);
+		System.IO.Compression.ZipFile.ExtractToDirectory(NewVersionZip, Root, true);
+		CheckNodeJSInstalled();
+	}
+	public static void InstallClean()
+	{
+
 		Environment.SetEnvironmentVariable("OpenRenderFarm", Root, EnvironmentVariableTarget.User);
 
+		if (CheckNodeJSInstalled())
+		{
+
+		}
+		else
+		{
+			InstallNodeJS();
+		}
 	}
 
+	public static void InstallNodeJS()
+	{
+		string nodeEXE = Directory.GetFiles(ResourcesFolder, "*node-v*")[0];
+		ProcessStartInfo oInfo = new ProcessStartInfo("msiexec.exe", @"/quiet /passive /i " +  nodeEXE );//msiexec.exe /i node-v0.10.23-x64.msi INSTALLDIR="C:\Tools\NodeJS" /quiet
+		oInfo.UseShellExecute = false;
+		oInfo.CreateNoWindow = false;
+		
+
+		Process process = Process.Start(oInfo);
+		process.WaitForExit();
+	}
+
+	public static bool CheckNodeJSInstalled()
+	{
+		ProcessStartInfo oInfo = new ProcessStartInfo("node", "-v");
+		oInfo.UseShellExecute = false;
+		oInfo.CreateNoWindow = true;
+
+		//so we are going to redirect the output and error so that we can parse the return
+		oInfo.RedirectStandardOutput = true;
+		oInfo.RedirectStandardError = true;
+
+		oInfo.WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden;
+
+
+		//Create the output and streamreader to get the output
+		string output = null; StreamReader srOutput = null;
+
+		//try the process
+		try
+		{
+			//run the process
+			Process proc = System.Diagnostics.Process.Start(oInfo);
+
+			proc.WaitForExit();
+
+			//get the output
+			srOutput = proc.StandardOutput;
+
+			//now put it in a string
+			output = srOutput.ReadToEnd();
+
+			proc.Close();
+			return true;
+		}
+		catch (Exception e)
+		{
+			output = string.Empty;
+			Console.WriteLine("NodeJS not installed, install new one from Resources Folder  ");
+			return false;
+		}
+		finally
+		{
+			//now, if we succeded, close out the streamreader
+			if (srOutput != null)
+			{
+				srOutput.Close();
+				srOutput.Dispose();
+			}
+		}
+		 
+	}
 	public static void UninstallAll()
 	{
 		
@@ -54,7 +143,7 @@ public class Paths
 			if(Dirs.Length>0)
 			for (int i = 0; i < Dirs.Length; i++)
 			{
-				if (!Dirs[i].Contains("Site")) Directory.Delete(Dirs[i]);
+				if (!Dirs[i].Contains("Site")) Directory.Delete(Dirs[i], true);
 			}
 		}
 	}
@@ -101,28 +190,50 @@ public class Paths
 	public static void DownloadNewVersionOfBuild()
 	{
 		List<int> versions = new List<int>();
-		for (int i = 0; i < Builds.Count; i++)
+		if (Builds.Count > 0)
 		{
-			
-			int parse = 0;
-			string str =  Builds[i].Substring(Builds[i].Length-8, 4);
-			int.TryParse( str , out parse);
-			if (parse != null) versions.Add(parse);
+			for (int i = 0; i < Builds.Count; i++)
+			{
+
+				int parse = 0;
+				string str = Builds[i].Substring(Builds[i].Length - 8, 4);
+				int.TryParse(str, out parse);
+				if (parse != null) versions.Add(parse);
+
+			}
+			versions.Sort();
+
+			using (var client = new WebClient())
+			{
+				Console.WriteLine("Download new Build: " + Builds[versions[versions.Count - 1] - 1]);
+				string input = Builds[versions[versions.Count - 1] - 1];
+				input = input.Replace("dir?path", "files?filename");
+				NewVersionZip = Path.Combine(Root, Builds[versions[versions.Count - 1] - 1].Substring(Builds[versions[versions.Count - 1] - 1].Length - 23, 23));
+				client.DownloadFile(input, NewVersionZip);
+				Install();
+
+			}
 
 		}
-		versions.Sort();
-
-		using (var client = new WebClient())
+		else
 		{
-			Console.WriteLine("Download new Build: " + Builds[versions[versions.Count - 1] - 1]);
-			string input = Builds[versions[versions.Count - 1]-1];
-			input = input.Replace("dir?path", "files?filename");
-			string output = Path.Combine(Root, Builds[versions[versions.Count - 1] - 1].Substring(Builds[versions[versions.Count - 1] - 1].Length-23,23));
-			client.DownloadFile(input,output);
-		}
+			CheckUnzippedFolderAndInstall();
 
+		}
 	}
+	
 
-
+	public static void CheckUnzippedFolderAndInstall()
+	{
+		string webserv = Directory.GetDirectories(Root, "*web_server*")[0];
+		if (webserv == null)
+		{
+			Console.WriteLine("new Builds are not available, install from .Zip file please.");
+		}
+		else
+		{
+			InstallClean();
+		}
+	}
 }
  
