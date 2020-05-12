@@ -126,8 +126,8 @@ class Program
     public static string GenerateFromToFFmpegJpg(string OriginalFilename,Job Joba)
     {
       
-
-        string tmp = " -i  " + OriginalFilename + " -s 640:360 " + "-y " + RenderTask.GetServerPreviewFileNameByOriginalFileName(OriginalFilename, Joba);
+        string FrameStamp=" -vf \"drawtext=fontfile=Arial.ttf: text='Frame\\:%{frame_num}': start_number="+ OriginalFilename.Substring(OriginalFilename .Length-8,4)+ ": x=0: y=h-(1*lh): fontcolor=black: fontsize=100: box=1: boxcolor=white: boxborderw=25\" ";
+        string tmp = " -i  " + OriginalFilename + FrameStamp+ " -s 640:360 " + "-y " + RenderTask.GetServerPreviewFileNameByOriginalFileName(OriginalFilename, Joba);
       //  Console.WriteLine("\nFFMPEG:  " + tmp + "\n");
         return tmp;
     }
