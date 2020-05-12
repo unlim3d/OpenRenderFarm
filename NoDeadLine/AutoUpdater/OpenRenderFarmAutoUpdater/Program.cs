@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace OpenRenderFarmAutoUpdater
 {
@@ -6,7 +7,16 @@ namespace OpenRenderFarmAutoUpdater
     {
         static void Main(string[] args)
         {
-            Paths.Install();
+
+            Paths.FindNewVersion();
+
+            System.Threading.Thread.Sleep(2000);
+        
+                Paths.UninstallAll();
+            //  Paths.Install();
+            Paths.DownloadNewVersionOfBuild();
+
+
         }
     }
 }
