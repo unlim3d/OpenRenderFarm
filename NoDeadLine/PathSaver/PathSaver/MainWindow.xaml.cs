@@ -4,6 +4,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Windows;
 using Newtonsoft.Json;
 
+
 namespace PathSaver
 {
     /// <summary>
@@ -55,6 +56,12 @@ namespace PathSaver
                         System.Windows.Application.Current.Shutdown();
                     }
                 }
+
+                if (App.startupArgument == App.StartupArgument.CollectPath)
+                {
+
+                }
+
             }
         }
 

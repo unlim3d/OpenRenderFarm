@@ -14,6 +14,7 @@ namespace PathSaver
     public partial class App : Application
     {
         public static StartupArgument startupArgument;
+        public static int idCollectPath;
         public  enum StartupArgument
         {
             RenderPath,
@@ -31,9 +32,15 @@ namespace PathSaver
                     MainWindow wnd = new MainWindow();
                 }
 
+                
+            }
+
+            if (e.Args.Length == 2)
+            {
                 if (e.Args[0] == "CollectPath")
                 {
                     startupArgument = StartupArgument.CollectPath;
+                    idCollectPath = int.Parse(e.Args[1]);
                     MessageBox.Show("Choice: \n\n" + e.Args[0]);
                     MainWindow wnd = new MainWindow();
                 }
