@@ -28,7 +28,7 @@ namespace PathSaver
                 if (e.Args[0] == "RenderPath")
                 {
                     startupArgument = StartupArgument.RenderPath;
-                    MessageBox.Show("Choice: \n\n" + e.Args[0]);
+                   // MessageBox.Show("Choice: \n\n" + e.Args[0]);
                     MainWindow wnd = new MainWindow();
                 }
 
@@ -41,7 +41,7 @@ namespace PathSaver
                 {
                     startupArgument = StartupArgument.CollectPath;
                     idCollectPath = int.Parse(e.Args[1]);
-                    MessageBox.Show("Choice: \n\n" + e.Args[0]);
+                   // MessageBox.Show("Choice: \n\n" + e.Args[0]);
                     MainWindow wnd = new MainWindow();
                 }
             }
