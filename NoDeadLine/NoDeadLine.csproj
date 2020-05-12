@@ -15,8 +15,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="AutoUpdater\**" />
     <Compile Remove="PathSaver\**" />
+    <EmbeddedResource Remove="AutoUpdater\**" />
     <EmbeddedResource Remove="PathSaver\**" />
+    <None Remove="AutoUpdater\**" />
     <None Remove="PathSaver\**" />
   </ItemGroup>
 
