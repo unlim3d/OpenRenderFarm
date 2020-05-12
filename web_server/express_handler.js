@@ -155,6 +155,11 @@ const ReadRenderedFiles = async function (req, res){
     return [0, result];
 };
 
+const Dir = async function(req, res){
+    let result = await utils.GetFiles(config.files_path + req.query.path);
+    res.json(result);
+};
+
 const SendFile = async function(req, res){
     const read_stream = fs.createReadStream(config.files_path + req.query.filename);
     if (read_stream){
@@ -167,6 +172,7 @@ const SendFile = async function(req, res){
 const routes = {
     "/": ReadRenderedFiles,
     "/files": SendFile,
+    "/dir": Dir,
 };
 
 module.exports = function (route) {

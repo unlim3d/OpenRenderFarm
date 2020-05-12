@@ -13,9 +13,6 @@ const GetFileStats = function (path){
     return new Promise(resolve => {
         fs.stat(path, (err, stats) => {
             if (err){
-
-
-                fs.mkdir(path); //Create dir in case not found
                 resolve([1, err]);
                 console.error(err);
                 return;
