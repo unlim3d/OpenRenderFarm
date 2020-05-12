@@ -5,9 +5,11 @@ R:\JopaFarm\ORFarm\NoDeadLine\AutoUpdater\OpenRenderFarmAutoUpdater\bin\Debug\ne
 R:\JopaFarm\ORFarm\NoDeadLine\AutoUpdater\OpenRenderFarmAutoUpdater\bin\Debug\netcoreapp3.1\OpenRenderFarmAutoUpdater.dll
 R:\JopaFarm\ORFarm\NoDeadLine\AutoUpdater\OpenRenderFarmAutoUpdater\bin\Debug\netcoreapp3.1\OpenRenderFarmAutoUpdater.pdb
 R:\JopaFarm\ORFarm\NoDeadLine\AutoUpdater\OpenRenderFarmAutoUpdater\obj\Debug\netcoreapp3.1\OpenRenderFarmAutoUpdater.csprojAssemblyReference.cache
-R:\JopaFarm\ORFarm\NoDeadLine\AutoUpdater\OpenRenderFarmAutoUpdater\obj\Debug\netcoreapp3.1\OpenRenderFarmAutoUpdater.csproj.CoreCompileInputs.cache
 R:\JopaFarm\ORFarm\NoDeadLine\AutoUpdater\OpenRenderFarmAutoUpdater\obj\Debug\netcoreapp3.1\OpenRenderFarmAutoUpdater.AssemblyInfoInputs.cache
 R:\JopaFarm\ORFarm\NoDeadLine\AutoUpdater\OpenRenderFarmAutoUpdater\obj\Debug\netcoreapp3.1\OpenRenderFarmAutoUpdater.AssemblyInfo.cs
 R:\JopaFarm\ORFarm\NoDeadLine\AutoUpdater\OpenRenderFarmAutoUpdater\obj\Debug\netcoreapp3.1\OpenRenderFarmAutoUpdater.dll
 R:\JopaFarm\ORFarm\NoDeadLine\AutoUpdater\OpenRenderFarmAutoUpdater\obj\Debug\netcoreapp3.1\OpenRenderFarmAutoUpdater.pdb
 R:\JopaFarm\ORFarm\NoDeadLine\AutoUpdater\OpenRenderFarmAutoUpdater\obj\Debug\netcoreapp3.1\OpenRenderFarmAutoUpdater.genruntimeconfig.cache
+R:\JopaFarm\ORFarm\NoDeadLine\AutoUpdater\OpenRenderFarmAutoUpdater\bin\Debug\netcoreapp3.1\Newtonsoft.Json.dll
+R:\JopaFarm\ORFarm\NoDeadLine\AutoUpdater\OpenRenderFarmAutoUpdater\obj\Debug\netcoreapp3.1\OpenRenderFarmAutoUpdater.csproj.CoreCompileInputs.cache
+R:\JopaFarm\ORFarm\NoDeadLine\AutoUpdater\OpenRenderFarmAutoUpdater\obj\Debug\netcoreapp3.1\OpenRenderFarmAutoUpdater.csproj.CopyComplete
