@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const mime = require('mime-types');
 
 const config = require('./config');
 const utils = require('./utils');
@@ -161,10 +162,21 @@ const Dir = async function(req, res){
 };
 
 const SendFile = async function(req, res){
-    const read_stream = fs.createReadStream(config.files_path + req.query.filename);
+    const full_path = config.files_path + req.query.filename;
+    let read_stream = fs.createReadStream(full_path);
+    read_stream.on('error', () => {
+        res.removeHeader('Content-Disposition');
+        res.removeHeader('Content-Type');
+        res.status(404);
+        res.send('No such file.');
+        read_stream.close();
+    });
     if (read_stream){
+        res.header('Content-Disposition', 'attachment; filename="' + path.basename(req.query.filename) + '"');
+        res.header('Content-Type', mime.lookup(full_path));
         read_stream.pipe(res);
     }else{
+        res.status(404);
         res.send('No such file.');
     }
 };
