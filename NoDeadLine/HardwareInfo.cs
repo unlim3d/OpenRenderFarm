@@ -57,6 +57,14 @@ namespace NoDeadLine
                 {
                     File.Move(pathStart, pathEnd);
                 }
+                string[] files = Directory.GetFiles(FarmSettings.DeadLineReportFolderWin);
+
+                foreach (string file in files)
+                {
+                    FileInfo fi = new FileInfo(file);
+                    if (fi.LastAccessTime < DateTime.Now.AddDays(-1))
+                        fi.Delete();
+                }
             }
             catch (Exception exception)
             {

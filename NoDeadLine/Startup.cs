@@ -15,8 +15,14 @@ public class StartUp
         CopyAddDirectoryImage();
         GetNetworkPoolInfo();
 
-        HardwareInfoStartUp();
+       
         Job.ClearJsonsDirectory();
+
+        var timer = new System.Threading.Timer(
+            e => HardwareInfoStartUp(),
+            null,
+            TimeSpan.Zero,
+            TimeSpan.FromMinutes(5));
     }
 
     private static void GetNetworkPoolInfo()
@@ -26,6 +32,7 @@ public class StartUp
 
     private static void HardwareInfoStartUp()
     {
+       
         HardwareInfo hardware = new HardwareInfo();
         hardware.StartCmd();
 
