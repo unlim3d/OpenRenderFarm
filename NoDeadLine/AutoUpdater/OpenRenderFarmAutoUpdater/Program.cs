@@ -7,6 +7,7 @@ namespace OpenRenderFarmAutoUpdater
     {
         static void Main(string[] args)
         {
+            Paths.TestDownload();
 
             Paths.FindNewVersion();
 
