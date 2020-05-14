@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -27,9 +28,11 @@ namespace PathSaver
            
             System.Windows.Forms.NotifyIcon nIcon = new System.Windows.Forms.NotifyIcon();
             nIcon.Visible = true;
-            nIcon.Icon = SystemIcons.Application;
-            nIcon.ShowBalloonTip(5000, "Title", "Text", System.Windows.Forms.ToolTipIcon.Info);
+            nIcon.Icon = new Icon(Directory.GetCurrentDirectory()+"\\favicon.ico");
+            nIcon.Text = "Farm";
+            //nIcon.ShowBalloonTip(5000, "Title", "Text", System.Windows.Forms.ToolTipIcon.Info);
             //nIcon.Click += NIcon_Click;
+            nIcon.MouseDoubleClick += NIcon_MouseDoubleClick;
             nIcon.ContextMenuStrip= new System.Windows.Forms.ContextMenuStrip();
             nIcon.ContextMenuStrip.Items.Add("Exit", null, this.MenuExit_Click);
 
@@ -58,6 +61,13 @@ namespace PathSaver
 
             
         }
+
+        private void NIcon_MouseDoubleClick(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            MainWindow.Visibility = Visibility.Visible;
+            MainWindow.WindowState = WindowState.Normal;
+        }
+
         void MenuExit_Click(object sender, EventArgs e)
         {
             Environment.Exit(0);

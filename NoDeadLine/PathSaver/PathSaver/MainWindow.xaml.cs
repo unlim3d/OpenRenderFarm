@@ -16,9 +16,19 @@ namespace PathSaver
         public MainWindow()
         {
             InitializeComponent();
+            this.Closed += MainWindow_Closed;
             this.Hide();
             Button_Click();
         }
+
+        private void MainWindow_Closed(object sender, EventArgs e)
+        {
+            Environment.Exit(0);
+        }
+
+        
+        
+
         private void Button_Click()
         {
             var dlg = new CommonOpenFileDialog();
