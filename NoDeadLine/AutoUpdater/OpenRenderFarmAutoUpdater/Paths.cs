@@ -199,8 +199,8 @@ public class Paths
         webClient.DownloadFile("http://dl.google.com/googletalk/googletalk-setup.exe", tempfile);
         sw.Stop();
 
-        FileInfo fileInfo = new FileInfo(tempfile);
-        long speed = fileInfo.Length / sw.Elapsed.Seconds/1024/100;
+        FileInfo fileInfo = new FileInfo(tempfile);  
+        float speed = fileInfo.Length / sw.Elapsed.Seconds/1024f;
 
         Console.WriteLine("Download duration: {0}", sw.Elapsed);
         Console.WriteLine("File size: {0}", fileInfo.Length.ToString("N0"));
