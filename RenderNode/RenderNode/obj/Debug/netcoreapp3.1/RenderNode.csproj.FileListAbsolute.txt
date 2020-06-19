@@ -1,0 +1,15 @@
+C:\OpenRenderFarm\RenderNode\RenderNode\bin\Debug\netcoreapp3.1\RenderNode.exe
+C:\OpenRenderFarm\RenderNode\RenderNode\obj\Debug\netcoreapp3.1\RenderNode.csprojAssemblyReference.cache
+C:\OpenRenderFarm\RenderNode\RenderNode\obj\Debug\netcoreapp3.1\RenderNode.AssemblyInfoInputs.cache
+C:\OpenRenderFarm\RenderNode\RenderNode\obj\Debug\netcoreapp3.1\RenderNode.AssemblyInfo.cs
+C:\OpenRenderFarm\RenderNode\RenderNode\bin\Debug\netcoreapp3.1\RenderNode.deps.json
+C:\OpenRenderFarm\RenderNode\RenderNode\bin\Debug\netcoreapp3.1\RenderNode.runtimeconfig.json
+C:\OpenRenderFarm\RenderNode\RenderNode\bin\Debug\netcoreapp3.1\RenderNode.runtimeconfig.dev.json
+C:\OpenRenderFarm\RenderNode\RenderNode\bin\Debug\netcoreapp3.1\RenderNode.dll
+C:\OpenRenderFarm\RenderNode\RenderNode\bin\Debug\netcoreapp3.1\RenderNode.pdb
+C:\OpenRenderFarm\RenderNode\RenderNode\bin\Debug\netcoreapp3.1\Newtonsoft.Json.dll
+C:\OpenRenderFarm\RenderNode\RenderNode\obj\Debug\netcoreapp3.1\RenderNode.csproj.CoreCompileInputs.cache
+C:\OpenRenderFarm\RenderNode\RenderNode\obj\Debug\netcoreapp3.1\RenderNode.csproj.CopyComplete
+C:\OpenRenderFarm\RenderNode\RenderNode\obj\Debug\netcoreapp3.1\RenderNode.dll
+C:\OpenRenderFarm\RenderNode\RenderNode\obj\Debug\netcoreapp3.1\RenderNode.pdb
+C:\OpenRenderFarm\RenderNode\RenderNode\obj\Debug\netcoreapp3.1\RenderNode.genruntimeconfig.cache
